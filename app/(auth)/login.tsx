@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { styled } from 'nativewind';
 import { MotiView } from 'moti';
 import { MotiPressable } from 'moti/interactions';
@@ -14,8 +14,66 @@ const StyledMotiView = styled(MotiView);
 const StyledKeyboardAvoidingView = styled(KeyboardAvoidingView);
 const StyledTouchableOpacity = styled(TouchableOpacity);
 
+// Add these helper functions at the top of the file
+const isValidEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
 export default function Login() {
-  const router = useRouter();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+  const [error, setError] = useState('');
+
+  const handleLogin = async () => {
+    try {
+      // Validate email
+      if (!formData.email) {
+        setError('Email is required');
+        return;
+      }
+      if (!isValidEmail(formData.email)) {
+        setError('Please enter a valid email address');
+        return;
+      }
+
+      // Validate password
+      if (!formData.password) {
+        setError('Password is required');
+        return;
+      }
+      if (formData.password.length < 8) {
+        setError('Password must be at least 8 characters long');
+        return;
+      }
+
+      // If validation passes, proceed with API call
+      const response = await fetch('http://192.168.0.11:3000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      console.log(data);
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Store the token (you might want to use secure storage in production)
+      // await SecureStore.setItemAsync('userToken', data.token);
+
+      // Navigate to the main app
+      router.replace('/(tabs)');
+    } catch (err: any) {
+      setError(err.message || 'An error occurred during login');
+    }
+  };
 
   return (
     <>
@@ -49,6 +107,12 @@ export default function Login() {
             Sign in to continue
           </StyledText>
 
+          {error ? (
+            <StyledText className="text-blood-red font-body mb-4">
+              {error}
+            </StyledText>
+          ) : null}
+
           <StyledView className="space-y-6 mb-8 mt-12">
             <StyledView>
               <StyledText className="text-ghost-white font-subheading mb-2 text-sm">
@@ -60,6 +124,8 @@ export default function Login() {
                 className="bg-charcoal-gray text-ghost-white px-4 py-4 rounded-xl font-body"
                 autoCapitalize="none"
                 keyboardType="email-address"
+                value={formData.email}
+                onChangeText={(text) => setFormData(prev => ({ ...prev, email: text }))}
               />
             </StyledView>
             
@@ -72,6 +138,8 @@ export default function Login() {
                 placeholderTextColor="#707070"
                 className="bg-charcoal-gray text-ghost-white px-4 py-4 rounded-xl font-body"
                 secureTextEntry
+                value={formData.password}
+                onChangeText={(text) => setFormData(prev => ({ ...prev, password: text }))}
               />
             </StyledView>
 
@@ -87,7 +155,7 @@ export default function Login() {
 
           <StyledMotiPressable 
             className="bg-bright-orange py-4 rounded-xl mb-6"
-            onPress={() => {}}
+            onPress={handleLogin}
             animate={({ pressed }) => {
               'worklet';
               return {

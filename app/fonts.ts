@@ -1,7 +1,7 @@
 import * as Font from 'expo-font';
 
 export const loadFonts = async () => {
-  await Font.loadAsync({
+  const fonts = {
     'Montserrat': require('../assets/fonts/Montserrat-Regular.ttf'),
     'Montserrat-Bold': require('../assets/fonts/Montserrat-Bold.ttf'),
     'Montserrat-Medium': require('../assets/fonts/Montserrat-Medium.ttf'),
@@ -16,5 +16,23 @@ export const loadFonts = async () => {
     'Inter-Light': require('../assets/fonts/Inter-Light.ttf'),
     'SpaceMono': require('../assets/fonts/SpaceMono-Regular.ttf'),
     'SpaceMono-Bold': require('../assets/fonts/SpaceMono-Bold.ttf'),
-  });
+  };
+
+  try {
+    // Load fonts one at a time
+    for (const [fontName, fontFile] of Object.entries(fonts)) {
+      try {
+        await Font.loadAsync({
+          [fontName]: fontFile
+        });
+        //console.log(`Successfully loaded font: ${fontName}`);
+      } catch (error) {
+        console.error(`Failed to load font ${fontName}:`, error);
+        // Continue loading other fonts even if one fails
+      }
+    }
+  } catch (error) {
+    console.error('Error in loadFonts:', error);
+    throw error;
+  }
 }; 

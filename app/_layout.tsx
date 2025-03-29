@@ -7,7 +7,14 @@ export default function Layout() {
   const colorScheme = useColorScheme();
 
   useEffect(() => {
-    loadFonts();
+    const loadFontsAsync = async () => {
+      try {
+        await loadFonts();
+      } catch (error) {
+        console.error('Error loading fonts:', error);
+      }
+    };
+    loadFontsAsync();
   }, []);
 
   return (
