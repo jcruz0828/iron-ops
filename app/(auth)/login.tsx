@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { styled } from 'nativewind';
 import { MotiView } from 'moti';
 import { MotiPressable } from 'moti/interactions';
 import { Ionicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
 
 const StyledView = styled(View);
 const StyledText = styled(Text);
@@ -66,10 +67,10 @@ export default function Login() {
       }
 
       // Store the token (you might want to use secure storage in production)
-      // await SecureStore.setItemAsync('userToken', data.token);
+      await SecureStore.setItemAsync('userToken', data.token);
 
       // Navigate to the main app
-      router.replace('/(tabs)');
+      router.replace('/(tabs)/home');
     } catch (err: any) {
       setError(err.message || 'An error occurred during login');
     }

@@ -13,7 +13,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jcoytfined.iron-ops"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +27,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "expo-secure-store"
     ]
   }
 }

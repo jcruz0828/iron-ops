@@ -1,4 +1,4 @@
-import { View, Text, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { styled } from 'nativewind';
 import { MotiView } from 'moti';
@@ -13,7 +13,7 @@ const StyledMotiPressable = styled(MotiPressable);
 const StyledMotiView = styled(MotiView);
 const StyledKeyboardAvoidingView = styled(KeyboardAvoidingView);
 const StyledTouchableOpacity = styled(TouchableOpacity);
-
+const StyledScrollView = styled(ScrollView);
 // Add these helper functions at the top of the file
 const isValidEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -122,13 +122,14 @@ export default function SignUp() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1 bg-carbon-black"
     >
+      <StyledScrollView className="bg-carbon-black">
       <Stack.Screen options={{ headerShown: false }} />
 
       <StyledMotiView 
         from={{ opacity: 0, translateY: 50 }}
         animate={{ opacity: 1, translateY: 0 }}
         transition={{ type: 'timing', duration: 500 }}
-        className="flex-1 px-6 pt-16"
+        className="flex-1 px-6 pt-16 pb-16 bg-carbon-black"
       >
         <StyledTouchableOpacity 
           onPress={() => router.back()}
@@ -243,6 +244,7 @@ export default function SignUp() {
           </StyledText>
         </StyledMotiPressable>
       </StyledMotiView>
+      </StyledScrollView>
     </StyledKeyboardAvoidingView>
   );
 } 

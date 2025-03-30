@@ -4,6 +4,8 @@ import { styled } from 'nativewind';
 import { MotiView } from 'moti';
 import { MotiPressable } from 'moti/interactions';
 import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import * as SecureStore from 'expo-secure-store';
 
 const StyledView = styled(View);
 const StyledText = styled(Text);
@@ -12,7 +14,21 @@ const StyledImageBackground = styled(ImageBackground);
 const StyledMotiPressable = styled(MotiPressable);
 
 export default function Home() {
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = await SecureStore.getItemAsync('userToken');
+      if (token) {
+        router.replace('/(tabs)/home');
+      } else {
+        setCheckingAuth(false); // done checking, show landing page
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
 
   return (
     <StyledImageBackground
