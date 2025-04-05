@@ -5,6 +5,10 @@ import { MotiView } from 'moti';
 import { MotiPressable } from 'moti/interactions';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import * as SecureStore from 'expo-secure-store';
+import ProgressBar from '../../components/ProgressBar';
+import { setName } from '@/store/user/UserSlice';
 
 const StyledView = styled(View);
 const StyledText = styled(Text);
@@ -31,6 +35,7 @@ const isValidPassword = (password: string) => {
 };
 
 export default function SignUp() {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -38,6 +43,7 @@ export default function SignUp() {
     confirmPassword: '',
   });
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
   const handleSignUp = async () => {
     try {
@@ -91,19 +97,21 @@ export default function SignUp() {
           password: formData.password,
         }),
       });
-
+      dispatch(setName(formData.fullName));
       const data = await response.json();
-      console.log(data);
+      
 
       if (!response.ok) {
         throw new Error(data.message || 'Registration failed');
       }
 
-      // Store the token (you might want to use secure storage in production)
-      // await SecureStore.setItemAsync('userToken', data.token);
+      // Store the token securely
+      await SecureStore.setItemAsync('userToken', data.token);
+
+      // Dispatch the action to set the user in Redux
 
       // Navigate to the main app
-      //router.replace('/(tabs)');
+      router.replace('/FitnessDataInput');
     } catch (err: any) {
       console.log(err);
       setError(err.message || 'An error occurred during registration');
@@ -131,6 +139,7 @@ export default function SignUp() {
         transition={{ type: 'timing', duration: 500 }}
         className="flex-1 px-6 pt-16 pb-16 bg-carbon-black"
       >
+        <ProgressBar currentStep={0} />
         <StyledTouchableOpacity 
           onPress={() => router.back()}
           className="mb-8"
@@ -190,10 +199,15 @@ export default function SignUp() {
               placeholder="Create a strong password"
               placeholderTextColor="#707070"
               className="bg-charcoal-gray text-ghost-white px-4 py-4 rounded-xl font-body"
-              secureTextEntry
+              secureTextEntry={!showPassword} // Toggle visibility
               value={formData.password}
               onChangeText={(text) => setFormData(prev => ({ ...prev, password: text }))}
             />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <StyledText className="text-bright-orange text-xs mt-1">
+                {showPassword ? 'Hide Password' : 'Show Password'}
+              </StyledText>
+            </TouchableOpacity>
             {renderPasswordHelp()}
           </StyledView>
 
@@ -205,7 +219,7 @@ export default function SignUp() {
               placeholder="Confirm your password"
               placeholderTextColor="#707070"
               className="bg-charcoal-gray text-ghost-white px-4 py-4 rounded-xl font-body"
-              secureTextEntry
+              secureTextEntry={!showPassword} // Toggle visibility
               value={formData.confirmPassword}
               onChangeText={(text) => setFormData(prev => ({ ...prev, confirmPassword: text }))}
             />

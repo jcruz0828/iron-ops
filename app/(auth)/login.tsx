@@ -6,6 +6,7 @@ import { MotiView } from 'moti';
 import { MotiPressable } from 'moti/interactions';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
+import { useDispatch } from 'react-redux';
 
 const StyledView = styled(View);
 const StyledText = styled(Text);
@@ -22,6 +23,7 @@ const isValidEmail = (email: string) => {
 };
 
 export default function Login() {
+  const dispatch = useDispatch(); // Initialize dispatch
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -61,10 +63,12 @@ export default function Login() {
       });
 
       const data = await response.json();
-      console.log(data);
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
       }
+
+      // Dispatch the action to set the user in Redux
+      
 
       // Store the token (you might want to use secure storage in production)
       await SecureStore.setItemAsync('userToken', data.token);
@@ -72,6 +76,8 @@ export default function Login() {
       // Navigate to the main app
       router.replace('/(tabs)/home');
     } catch (err: any) {
+      console.log(err);
+      console.log(formData);
       setError(err.message || 'An error occurred during login');
     }
   };

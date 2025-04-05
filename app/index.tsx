@@ -20,8 +20,9 @@ export default function Home() {
   useEffect(() => {
     const checkLoginStatus = async () => {
       const token = await SecureStore.getItemAsync('userToken');
+      SecureStore.deleteItemAsync('userToken');
       if (token) {
-        router.replace('/(tabs)/home');
+       router.replace('/(tabs)/home');
       } else {
         setCheckingAuth(false); // done checking, show landing page
       }
